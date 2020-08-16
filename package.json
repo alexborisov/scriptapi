@@ -1,7 +1,12 @@
 {
   "name": "scriptapi",
   "version": "0.1.0",
-  "main": "index.js",
+  "description": "Expose shell commands as HTTP resources",
+  "author": "Alex Borisov <alex@alexborisov.org>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexborisov/scriptapi.git"
+  },
   "license": "MIT",
   "bin": {
     "scriptapid": "./bin/scriptapid.js"
