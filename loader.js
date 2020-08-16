@@ -1,19 +1,9 @@
 const fs = require("fs");
 const util = require("util");
 const readline = require("readline");
-const { execCommand } = require("./runner");
 
 const readdir = util.promisify(fs.readdir);
 
-async function listFiles(path) {
-  try {
-    const names = await readdir(path);
-    return [...names];
-  } catch (error) {
-    console.error("failed to list files", error);
-    return [];
-  }
-}
 function scanFile(path) {
   return new Promise((resolve, reject) => {
     const data = {};
@@ -32,29 +22,36 @@ function scanFile(path) {
   });
 }
 
-exports.loadScripts = async (path = "~/.config/scriptapi") => {
-  console.log(`Loading scripts [${path}]...`);
+async function loadScript(scriptPath) {
+  const script = await scanFile(scriptPath)
+  return script 
+}
+async function loadScripts(scriptDir) {
   try {
-    const files = await listFiles(path);
+    const names = await readdir(scriptDir);
+    const paths = names.map(name => `${scriptDir}/${name}`)
     const scripts = await Promise.all(
-      files.map((fileName) => scanFile(`${path}/${fileName}`))
+      paths.map((path) => scanFile(path))
     );
-    console.log("Scripts loaded", scripts);
-    return [...scripts];
-  } catch (error) {
-    console.error("Failed to load scripts", error);
-    return [];
+    return scripts 
+  } catch(error) {
+    console.error(error)
+    return []
   }
-};
-exports.registerScripts = async (app, scripts = []) => {
-  console.log(`Registering scripts...`, scripts);
+}
+async function watchScripts(scriptDir, cb) {
+  console.log('watch', scriptDir)
+  const scripts = await loadScripts(scriptDir)
+  scripts.forEach(cb)
+  fs.watch(scriptDir, async(eventType, filename) => {
+    console.log('watch', eventType, filename)
+    const script = await loadScript(`${scriptDir}/${filename}`)
+    cb(script)
+  })
+}
 
-  scripts.forEach(({ name, cmd }) => {
-    app.get(`/${name}`, async (req, res) => {
-      const result = await execCommand(cmd, req.query);
-      res.send(result);
-    });
-    console.log(`Registered /${name}`);
-  });
-  console.log("Scripts registered");
-};
+module.exports = {
+  loadScript,
+  loadScripts,
+  watchScripts
+}
