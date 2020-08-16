@@ -1,21 +1,24 @@
 #!/usr/bin/env node
 
-const express = require("express");
 const os = require("os");
-const { loadScripts, registerScripts } = require("../loader");
+const { program } = require("commander");
+const package = require("../package.json");
+const { startServer } = require("../server");
 
-const port = 3000;
-const scriptPath = `${os.homedir()}/.config/scriptapi`;
+program
+  .version(package.version)
+  .option("-p, --port <port>", "server port", 3000)
+  .option("-h, --host <host>", "server host", "localhost")
+  .option(
+    "-s, --scriptDir <path>",
+    "location of scripts",
+    `${os.homedir()}/.config/scriptapi`
+  );
 
-const app = express();
+program.parse(process.argv);
 
-async function start() {
-  console.log("Starting daemon...");
-  const scripts = await loadScripts(scriptPath);
-  registerScripts(app, scripts);
-  app.listen(port, async () => {
-    console.log(`API server online http://localhost:${port}`);
-  });
-}
-
-start();
+startServer({
+  port: program.port,
+  host: program.host,
+  scriptDir: program.scriptDir,
+});

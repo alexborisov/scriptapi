@@ -1,12 +1,13 @@
 {
   "name": "scriptapi",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "license": "MIT",
   "bin": {
     "scriptapid": "./bin/scriptapid.js"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "commander": "^6.0.0",
+    "express": "^4.17.1",
   }
 }
