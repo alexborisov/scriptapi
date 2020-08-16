@@ -5,7 +5,7 @@ const { execCommand } = require("./runner");
 
 const app = express();
 
-exports.startServer = ({ port, scriptDir }) => {
+exports.startServer = ({ port, host, scriptDir }) => {
   const scripts = {};
 
   watchScripts(scriptDir, (script) => {
@@ -30,7 +30,7 @@ exports.startServer = ({ port, scriptDir }) => {
     }
   });
 
-  app.listen(port, () => {
-    console.log(`Server online http://localhost:${port}`);
+  app.listen(port, host, () => {
+    console.log(`Server online http://${host}:${port}`);
   });
 };
