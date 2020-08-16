@@ -6,10 +6,11 @@ const { execCommand } = require("./runner");
 const app = express();
 
 exports.startServer = ({ port, host, scriptDir }) => {
+  console.log('Starting server...')
   const scripts = {};
 
   watchScripts(scriptDir, (script) => {
-    console.log("load script", script);
+    console.log("Loading script", script);
     scripts[script.name] = script;
   });
 
@@ -23,8 +24,12 @@ exports.startServer = ({ port, host, scriptDir }) => {
     const { scriptName } = req.params;
     if (scripts[scriptName]) {
       const { cmd } = scripts[scriptName];
-      const result = await execCommand(cmd, req.query);
-      res.send(result.stdout);
+      try {
+        const { stdout, stderr } = await execCommand(cmd, req.query);
+        stderr ? res.send(stderr) : res.send(stdout)
+      } catch(error) {
+        res.status(500).send(error)
+      }
     } else {
       res.send("undefined");
     }
