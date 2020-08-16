@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 const express = require("express");
+const os = require("os");
 const { loadScripts, registerScripts } = require("../loader");
 
 const port = 3000;
-const scriptPath = `/Users/alex/.config/scriptapi`;
+const scriptPath = `${os.homedir()}/.config/scriptapi`;
 
 const app = express();
 
